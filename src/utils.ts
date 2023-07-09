@@ -45,3 +45,9 @@ export const hexToDecimal = (hex: string) => {
 		return '0'.repeat(77);
 	}
 };
+
+export const isValidHex = (hex: string, length: number) => {
+	const hexPattern = new RegExp(`^[A-Fa-f0-9]{${length}}$`);
+
+	return hexPattern.test(hex);
+};

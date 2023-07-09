@@ -3,7 +3,7 @@
 	import Grid from '../components/Grid.svelte';
 	import Info from '../components/Info.svelte';
 	import { currRandom, iters, play, seed, totalIters } from '../stores/store';
-	import { getRandomHex, hexToBinary } from '../utils';
+	import { getRandomHex, hexToBinary, isValidHex } from '../utils';
 
 	let editable: boolean = false;
 	let keyPlay: boolean = false;
@@ -12,9 +12,9 @@
 
 	let modal: HTMLDialogElement;
 
-	$: {
-		console.log('main page re-rendered');
-	}
+	// $: {
+	// 	console.log('main page re-rendered');
+	// }
 </script>
 
 <svelte:document
@@ -43,61 +43,66 @@
 	}} />
 
 <div class="mt-[7.5rem] flex max-w-full flex-col justify-around gap-7 lg:mx-10">
-	<h1 class="prose ml-[-4.5rem] inline max-w-full text-center font-[Montserrat] text-5xl font-bold">
+	<h1
+		class="prose inline max-w-full text-center font-[Montserrat] text-5xl font-bold sm:ml-[-1rem] lg:ml-[-4.5rem]">
 		PrimeCell
 	</h1>
 	<div class="flex w-full flex-wrap justify-center">
-		<section class="me-10 flex w-full max-w-xs flex-col gap-y-4">
+		<section class="flex w-full max-w-xs flex-col gap-y-4 md:me-10">
 			<form class="flex flex-col gap-y-4">
 				<fieldset class="form-control">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
 					<label class="label">
 						<legend class="label-text text-2xl font-medium">Seed</legend>
-						<span class="label-textx-alt label-text">
-							<button
-								class="btn-neutral btn-square btn"
-								on:click={() => {
-									$seed = getRandomHex(64);
-									$iters = 0;
-									$totalIters = 0;
-								}}>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="lucide lucide-dices"
-									><rect width="12" height="12" x="2" y="10" rx="2" ry="2" /><path
-										d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6" /><path
-										d="M6 18h.01" /><path d="M10 14h.01" /><path d="M15 6h.01" /><path
-										d="M18 9h.01" /></svg
-								></button>
-							<button
-								class="btn-neutral btn-square btn"
-								on:click={() => {
-									// copy the seed to clipboard
-									navigator.clipboard.writeText($seed);
-									console.log(hexToBinary($seed));
-								}}>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="lucide lucide-copy"
-									><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path
-										d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg
-								></button>
+						<span class="label-text-alt">
+							<div class="tooltip" data-tip="Randomize Seed">
+								<button
+									class="btn-neutral btn-square btn"
+									on:click={() => {
+										$seed = getRandomHex(64);
+										$iters = 0;
+										$totalIters = 0;
+									}}>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="lucide lucide-dices"
+										><rect width="12" height="12" x="2" y="10" rx="2" ry="2" /><path
+											d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6" /><path
+											d="M6 18h.01" /><path d="M10 14h.01" /><path d="M15 6h.01" /><path
+											d="M18 9h.01" /></svg
+									></button>
+							</div>
+							<div class="tooltip" data-tip="Copy Seed">
+								<button
+									class="btn-neutral btn-square btn"
+									on:click={() => {
+										// copy the seed to clipboard
+										navigator.clipboard.writeText($seed);
+										console.log(hexToBinary($seed));
+									}}>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="lucide lucide-copy">
+										<rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path
+											d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
+								</button>
+							</div>
 						</span>
 					</label>
 					<input
@@ -107,11 +112,11 @@
 						bind:value={$seed}
 						class:input-error={$seed.length !== 64} />
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					{#if $seed.length !== 64}
+					{#if $seed.length !== 64 || !isValidHex($seed, 64)}
 						<label class="label">
 							<span class="label-text-alt" transition:fade
-								>The Seed phrase must be equal to 64 digits.</span
-							></label>
+								>Check the Seed Hex for Invalid Characters or Incorrect Length
+							</span></label>
 					{/if}
 				</fieldset>
 				<div class="flex items-center justify-between">
@@ -127,7 +132,7 @@
 				</div>
 				<button
 					class="btn-neutral btn"
-					class:btn-disabled={$seed.length !== 64 || iterations < 1}
+					class:btn-disabled={$seed.length !== 64 || iterations < 1 || !isValidHex($seed, 64)}
 					on:click={() => {
 						$iters = iterations;
 						keyPlay = false;
@@ -173,9 +178,58 @@
 			</div>
 		</section>
 
-		<div class="divider w-full md:divider-vertical lg:divider-horizontal" />
-		<div class="ms-10">
+		<div class="divider divider-vertical w-full md:divider-horizontal" />
+		<div class="md:ms-10">
 			<Grid {editable} {keyPlay} {clear} />
+		</div>
+	</div>
+	<div class="flex flex-col items-baseline self-center max-md:gap-y-2 md:flex-row lg:ml-[-8rem]">
+		<div class="text-center max-md:w-full md:shrink-0">
+			<button
+				class="kbd kbd-md mr-1 font-mono"
+				on:click={() => {
+					$play = false;
+					keyPlay = !keyPlay;
+					$iters = Infinity;
+				}}>Space</button>
+			for Pause/Play&nbsp;&nbsp;
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="hsl(var(--bc) / var(--tw-text-opacity, 1))"
+				class="inline max-md:hidden"><circle cx="12.1" cy="12.1" r="4" /></svg>
+			&nbsp; &nbsp;
+		</div>
+		<div class="text-center max-md:w-full md:shrink-0">
+			<button
+				class="kbd kbd-md mr-1 font-mono"
+				on:click={() => {
+					editable = !editable;
+				}}>Enter</button>
+			for Edit Mode Toggle&nbsp;&nbsp;
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="hsl(var(--bc) / var(--tw-text-opacity, 1))"
+				class="inline max-md:hidden"><circle cx="12.1" cy="12.1" r="4" /></svg>
+			&nbsp; &nbsp;
+		</div>
+		<div class="text-center max-md:w-full md:shrink-0">
+			<button
+				class="kbd kbd-md mr-1 font-mono"
+				on:click={async () => {
+					clear = true;
+					await new Promise((_) => setTimeout(_, 150));
+					clear = false;
+					$seed = '0'.repeat(64);
+					$iters = 0;
+					$totalIters = 0;
+				}}>Esc</button>
+			for Clearing Seed & Grid
 		</div>
 	</div>
 </div>

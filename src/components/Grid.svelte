@@ -116,6 +116,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
+
 <div class="w-fit border border-slate-400">
 	<div
 		class="grid w-max"
@@ -141,18 +142,17 @@
 					).toString(16) +
 					$seed.slice(start + 1);
 			}
-		}}
-	>
+		}}>
 		{#each cells as row, x}
 			{#each row as cell, y}
 				<div
 					data-x={x}
 					data-y={y % num}
 					data-live={cell}
-					class="h-7 w-7 select-none border border-slate-400 text-center"
+					style="width: calc((100vw * 0.90)/16); height: calc((100vw * 0.90)/16);"
+					class="max-h-7 max-w-[1.75rem] select-none border border-slate-400 text-center"
 					class:cursor-default={!editable}
-					class:bg-slate-500={Boolean(cell)}
-				>
+					class:bg-slate-500={Boolean(cell)}>
 					{#if isNaN(cell)}
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -165,8 +165,7 @@
 							stroke-linecap="round"
 							stroke-linejoin="round"
 							class="mx-auto my-auto align-middle"
-							><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
-						>
+							><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
 					{/if}
 				</div>
 			{/each}

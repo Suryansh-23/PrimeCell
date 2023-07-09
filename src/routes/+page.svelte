@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import Grid from '../components/Grid.svelte';
+	import Info from '../components/Info.svelte';
 	import { currRandom, iters, play, seed, totalIters } from '../stores/store';
 	import { getRandomHex, hexToBinary } from '../utils';
 
@@ -9,7 +10,7 @@
 	let clear: boolean = false;
 	let iterations: number = 10;
 
-	let modal;
+	let modal: HTMLDialogElement;
 
 	$: {
 		console.log('main page re-rendered');
@@ -18,23 +19,33 @@
 
 <svelte:document
 	on:keydown={async (e) => {
-		// console.log(e);
-		if (e.key === 'Enter') {
-			editable = !editable;
-		} else if (e.key === ' ') {
-			$play = false;
-			keyPlay = !keyPlay;
-			$iters = Infinity;
-		} else if (e.key === 'Escape') {
-			clear = true;
-			await new Promise((_) => setTimeout(_, 150));
-			clear = false;
-			$seed = '0'.repeat(64);
+		if (e instanceof KeyboardEvent) {
+			// console.log(e);
+			switch (e.key) {
+				case 'Enter':
+					editable = !editable;
+					return;
+				case ' ':
+					$play = false;
+					keyPlay = !keyPlay;
+					$iters = Infinity;
+					return;
+				case 'Escape':
+					clear = true;
+					await new Promise((_) => setTimeout(_, 150));
+					clear = false;
+					$seed = '0'.repeat(64);
+					$iters = 0;
+					$totalIters = 0;
+					return;
+			}
 		}
 	}} />
 
 <div class="mt-[7.5rem] flex max-w-full flex-col justify-around gap-7 lg:mx-10">
-	<h1 class="prose ml-[-4rem] max-w-full text-center text-5xl font-bold">PrimeCell</h1>
+	<h1 class="prose ml-[-4.5rem] inline max-w-full text-center font-[Montserrat] text-5xl font-bold">
+		PrimeCell
+	</h1>
 	<div class="flex w-full flex-wrap justify-center">
 		<section class="me-10 flex w-full max-w-xs flex-col gap-y-4">
 			<form class="flex flex-col gap-y-4">
@@ -47,6 +58,8 @@
 								class="btn-neutral btn-square btn"
 								on:click={() => {
 									$seed = getRandomHex(64);
+									$iters = 0;
+									$totalIters = 0;
 								}}>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -146,7 +159,9 @@
 				<div
 					class="join-vertical join w-full font-mono"
 					on:click|capture={(e) => {
-						navigator.clipboard.writeText(e.target?.innerText);
+						if (e instanceof MouseEvent && e.target instanceof HTMLButtonElement) {
+							navigator.clipboard.writeText(e.target?.innerText);
+						}
 					}}>
 					<div class="tooltip tooltip-right" data-tip="Copy">
 						<button class="btn-neutral mb-2 w-full truncate p-1 px-2">{$currRandom.hex}</button>
@@ -164,8 +179,21 @@
 		</div>
 	</div>
 </div>
-<div class="absolute right-4 top-4 flex gap-x-3">
-	<a class="btn-neutral btn-square btn" href="https:\\github.com\Suryansh-23" target="_blank">
+<div class="absolute right-4 top-4 flex items-center gap-x-3">
+	<div class="flex items-center font-medium">
+		Built using
+		<a href="https://svelte.dev/" target="_blank" rel="noopener noreferrer" class="-mr-6 pl-1">
+			<img
+				class="h-16 w-16"
+				src="https://svelte.dev/_app/immutable/assets/svelte-logo.5c5d7d20.svg"
+				alt="Svelte" />
+		</a>
+	</div>
+	<a
+		class="btn-neutral btn-square btn"
+		href="https:\\github.com\Suryansh-23\primecell"
+		rel="noopener noreferrer"
+		target="_blank">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
@@ -202,9 +230,10 @@
 		></button>
 </div>
 <dialog bind:this={modal} class="modal">
-	<form method="dialog" class="frost modal-box">
-		<h3 class="text-lg font-bold">Hello!</h3>
-		<p class="py-4">Press ESC key or click outside to close</p>
+	<form method="dialog" class="frost modal-box pb-10">
+		<!-- <h3 class="text-lg font-bold">Hello!</h3> -->
+		<!-- <p class="py-4">Press ESC key or click outside to close</p> -->
+		<Info />
 	</form>
 	<form method="dialog" class="modal-backdrop">
 		<button class="cursor-default">close</button>

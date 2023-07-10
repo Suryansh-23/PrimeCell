@@ -7,7 +7,7 @@
 	</p>
 </div> -->
 
-<h2 class="mb-4 text-center font-[Montserrat] text-3xl font-bold">About PrimeCell</h2>
+<h2 class="mb-4 text-center font-Montserrat text-3xl font-bold">About PrimeCell</h2>
 <p class="mb-4">
 	This web app uses <a
 		class="font-extrabold underline decoration-dotted underline-offset-2"

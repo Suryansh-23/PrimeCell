@@ -44,7 +44,7 @@
 
 <div class="mt-[7.5rem] flex max-w-full flex-col justify-around gap-7 lg:mx-10">
 	<h1
-		class="prose inline max-w-full text-center font-[Montserrat] text-5xl font-bold sm:ml-[-1rem] lg:ml-[-4.5rem]">
+		class="prose inline max-w-full text-center font-Montserrat text-5xl font-bold sm:ml-[-1rem] lg:ml-[-4.5rem]">
 		PrimeCell
 	</h1>
 	<div class="flex w-full flex-wrap justify-center">
